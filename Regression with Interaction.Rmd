@@ -1,0 +1,59 @@
+---
+title: "Regression with Interaction"
+author: "Nestor Rabuya"
+date: "2023-02-02"
+output: html_document
+---
+```{r}
+install.packages("tidyverse")
+library(tidyverse)
+install.packages("caret")
+library(caret)
+```
+
+```{r}
+# Load the data
+data("marketing", package = "datarium")
+# Inspect the data
+sample_n(marketing, 3)
+```
+```{r}
+# Split the data into training and test set
+set.seed(123)
+training.samples <- marketing$sales %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data  <- marketing[training.samples, ]
+test.data <- marketing[-training.samples, ]
+```
+
+# Additive Model
+```{r}
+# Build the model
+model1 <- lm(sales ~ youtube + facebook, data = train.data)
+# Summarize the model
+summary(model1)
+```
+
+```{r}
+# Make predictions
+predictions <- model1 %>% predict(test.data)
+# Model performance
+# (a) Prediction error, RMSE
+RMSE(predictions, test.data$sales)
+```
+
+```{r}
+# (b) R-square
+R2(predictions, test.data$sales)
+```
+# Interaction effects
+```{r}
+# Build the model
+# Use this: 
+model2 <- lm(sales ~ youtube + facebook + youtube:facebook,
+             data = marketing)
+# Or simply, use this: 
+model2 <- lm(sales ~ youtube*facebook, data = train.data)
+# Summarize the model
+summary(model2)
+```
